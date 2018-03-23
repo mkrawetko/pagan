@@ -1,0 +1,5 @@
+<foo attr1="atr1Val">
+    <boo attr2="attr2Val" attr3="attr3Val">
+        boo Value
+    </boo>
+</foo>
