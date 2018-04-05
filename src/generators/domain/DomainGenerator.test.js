@@ -1,6 +1,6 @@
 'use strict';
 import 'jsdom-global/register'
-import {convertToActionUnits} from "../ActionUnitsConverter";
+import {convertToActionUnits, convertToDomain} from "../ActionUnitsConverter";
 import {createDomain} from "./DomainGenerator";
 
 const chai = require('chai')
@@ -20,9 +20,28 @@ describe('Domain Generator', function () {
 
         const INPUT_ACTION_UNITS = convertToActionUnits(INPUT_PAYLOAD);
 
+
         it('should generate domain', function () {
 
-            return expect(createDomain(INPUT_ACTION_UNITS)).to.equal(
+            let actual = createDomain(INPUT_ACTION_UNITS);
+            console.log(actual);
+            expect(actual.package).to.equal("org.domain");
+            expect(actual.imports).to.deep.equal([
+                "com.fasterxml.jackson.annotation.JsonCreator",
+                "com.fasterxml.jackson.annotation.JsonProperty",
+                "com.fasterxml.jackson.annotation.JsonRootName",
+                "com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty",
+            ]);
+            expect(actual.classDefinition.name).to.equal("Foo");
+            expect(actual.classDefinition.isStatic).to.equal(false);
+            expect(actual.classDefinition.annotations).to.deep.equal([
+                "@JsonRootName(\"foo\")"
+            ]);
+            expect(actual.classDefinition.properties[0].name).to.equal("attr1");
+            expect(actual.classDefinition.properties[0].type).to.equal("String");
+            expect(actual.classDefinition.properties[1].name).to.equal("boo");
+            expect(actual.classDefinition.properties[1].type).to.equal("Boo");
+            expect(actual).to.equal(
                 "package org.domain;\n" +
                 "\n" +
                 "import com.fasterxml.jackson.annotation.JsonCreator;\n" +
