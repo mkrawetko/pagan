@@ -12,10 +12,11 @@ describe('Domain Generator', function () {
     describe('#generateDomain ', function () {
 
         const INPUT_PAYLOAD =
-            "<foo attr1=\"atr1Val\">\n" +
+            "  <foo attr1=\"atr1Val\">\n" +
             "    <boo attr2=\"attr2Val\" attr3=\"attr3Val\">\n" +
-            "        boo Value\n" +
+            "        <innerboo innerbooAttr1=\"12\"/>\n" +
             "    </boo>\n" +
+            "    <moo moo1=\"moo1Val\"/>\n" +
             "</foo>";
 
         const INPUT_ACTION_UNITS = convertToActionUnits(INPUT_PAYLOAD);
@@ -23,18 +24,24 @@ describe('Domain Generator', function () {
 
         it('should generate domain object', function () {
 
-            let actual = createDomain(INPUT_ACTION_UNITS);
+            let actual = createDomain(INPUT_PAYLOAD);
             console.log(actual);
             expect(actual.name).to.equal("foo");
             expect(actual.simpleProperties.length).to.equal(1);
             expect(actual.simpleProperties[0]).to.equal("attr1");
-            expect(actual.objectProperties.length).to.equal(1);
+            expect(actual.objectProperties.length).to.equal(2);
 
             let booProperty = actual.objectProperties[0];
             expect(booProperty.name).to.equal("boo");
             expect(booProperty.simpleProperties.length).to.equal(2);
             expect(booProperty.simpleProperties[0]).to.equal("attr2");
             expect(booProperty.simpleProperties[1]).to.equal("attr3");
+            expect(booProperty.objectProperties.length).to.equal(0);
+
+            let mooProperty = actual.objectProperties[1];
+            expect(booProperty.name).to.equal("moo");
+            expect(booProperty.simpleProperties.length).to.equal(1);
+            expect(booProperty.simpleProperties[0]).to.equal("moo1");
             expect(booProperty.objectProperties.length).to.equal(0);
 
             expect(actual).to.equal(

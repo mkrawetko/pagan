@@ -1,5 +1,6 @@
 <foo attr1="atr1Val">
     <boo attr2="attr2Val" attr3="attr3Val">
-        boo Value
+        <innerboo innerbooAttr1="12"/>
     </boo>
+    <moo moo1="moo1Val"/>
 </foo>
