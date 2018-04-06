@@ -1,19 +1,5 @@
 import {ClassDefinition, JavaClass} from "./JavaClass";
 
-function createClassProperties(actionUnits) {
-    let builder = "";
-    for (let i = 1; i < actionUnits.length; i++) {
-        let property = actionUnits[i];
-        builder += "\n\n    @JacksonXmlProperty";
-        builder += "\n    ";
-        if (property.path.includes("@")) {
-            builder += "String " + property.name + ";"
-        } else {
-            builder += capitalizeFirstLetter(property.name) + " " + property.name + ";";
-        }
-    }
-    return builder;
-}
 
 function createConstructor(className, thisClassUnits) {
     let builder = "";
@@ -40,44 +26,21 @@ function createConstructor(className, thisClassUnits) {
     return builder;
 }
 
-function createClass(builder, actionUnits, classType = "") {
-    let innerStaticClass = "";
-    let thisClassUnits = actionUnits;
-    // let nextClassIdx = actionUnits.slice(1).findIndex(unit => !unit.path.includes("@"));
-    // if (nextClassIdx >= 0) {
-    //     thisClassUnits = actionUnits.slice(0, nextClassIdx + 2);
-    //     innerStaticClass = createClass(actionUnits.slice(nextClassIdx + 1));
-    // }
+function createClass(builder, actionUnits) {
 
     let rootTagName = actionUnits[0].name;
-    let className = capitalizeFirstLetter(rootTagName);
-    let classDefinition = new ClassDefinition.Builder()
-        .withName(className);
-    classDefinition.withAnnotation("@JsonRootName(\"" + rootTagName + "\")");
-    if (classType !== "") {
-        classDefinition.withStaticModifier();
-    }
-    // builder += "\npublic class " + classType + " " + className + " implements Serializable{";
-
+    builder.withName(rootTagName);
     for (let i = 1; i < actionUnits.length; i++) {
         let property = actionUnits[i];
-        builder += "\n\n    @JacksonXmlProperty";
-        builder += "\n    ";
         if (property.path.includes("@")) {
             builder.withSimpleProperty(property.name);
         } else {
-            builder.withObjectProperty(property.name);
-            builder += capitalizeFirstLetter(property.name) + " " + property.name + ";";
+            let clazz = createClass(new JavaClass.Builder(), actionUnits.splice(i)).build();
+            builder.withObjectProperty(clazz);
+            break;
         }
     }
-
-    // builder += createClassProperties(thisClassUnits);
-    // builder += createConstructor(className, thisClassUnits);
-
-    // builder += "\n" + innerStaticClass;
-    // builder += "\n}";
-    // return builder;
-    builder.withClassDefinition(classDefinition.build());
+    return builder;
 }
 
 function capitalizeFirstLetter(string) {
@@ -85,21 +48,7 @@ function capitalizeFirstLetter(string) {
 }
 
 function createDomain(actionUnits) {
-    let builder = new JavaClass.Builder().withPackage("org.domain");
-    //
-    // let builder = "package org.domain;";
-    // builder += "\n\nimport com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;" +
-    //     "\nimport com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;";
-    // builder += createClass(actionUnits);
-    //
-    // return builder;
-    builder.withImport("com.fasterxml.jackson.annotation.JsonCreator")
-        .withImport("com.fasterxml.jackson.annotation.JsonProperty")
-        .withImport("com.fasterxml.jackson.annotation.JsonRootName")
-        .withImport("com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty");
-
-    createClass(builder, actionUnits);
-    return builder.build();
+    return createClass(new JavaClass.Builder(), actionUnits).build();
 }
 
 

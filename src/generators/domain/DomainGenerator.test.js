@@ -21,26 +21,22 @@ describe('Domain Generator', function () {
         const INPUT_ACTION_UNITS = convertToActionUnits(INPUT_PAYLOAD);
 
 
-        it('should generate domain', function () {
+        it('should generate domain object', function () {
 
             let actual = createDomain(INPUT_ACTION_UNITS);
             console.log(actual);
-            expect(actual.package).to.equal("org.domain");
-            expect(actual.imports).to.deep.equal([
-                "com.fasterxml.jackson.annotation.JsonCreator",
-                "com.fasterxml.jackson.annotation.JsonProperty",
-                "com.fasterxml.jackson.annotation.JsonRootName",
-                "com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty",
-            ]);
-            expect(actual.classDefinition.name).to.equal("Foo");
-            expect(actual.classDefinition.isStatic).to.equal(false);
-            expect(actual.classDefinition.annotations).to.deep.equal([
-                "@JsonRootName(\"foo\")"
-            ]);
-            expect(actual.classDefinition.properties[0].name).to.equal("attr1");
-            expect(actual.classDefinition.properties[0].type).to.equal("String");
-            expect(actual.classDefinition.properties[1].name).to.equal("boo");
-            expect(actual.classDefinition.properties[1].type).to.equal("Boo");
+            expect(actual.name).to.equal("foo");
+            expect(actual.simpleProperties.length).to.equal(1);
+            expect(actual.simpleProperties[0]).to.equal("attr1");
+            expect(actual.objectProperties.length).to.equal(1);
+
+            let booProperty = actual.objectProperties[0];
+            expect(booProperty.name).to.equal("boo");
+            expect(booProperty.simpleProperties.length).to.equal(2);
+            expect(booProperty.simpleProperties[0]).to.equal("attr2");
+            expect(booProperty.simpleProperties[1]).to.equal("attr3");
+            expect(booProperty.objectProperties.length).to.equal(0);
+
             expect(actual).to.equal(
                 "package org.domain;\n" +
                 "\n" +
