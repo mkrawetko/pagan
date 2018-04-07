@@ -51,10 +51,7 @@ describe('Domain Generator', function () {
         it('should generate valid java class string', function () {
 
             let actual = createJavaClassString(INPUT_PAYLOAD);
-            console.log(actual);
-
-            expect(actual).to.equal(
-                "package org.domain;\n" +
+            let expected = "package org.domain;\n" +
                 "\n" +
                 "import com.fasterxml.jackson.annotation.JsonCreator;\n" +
                 "import com.fasterxml.jackson.annotation.JsonProperty;\n" +
@@ -65,7 +62,6 @@ describe('Domain Generator', function () {
                 "public class Foo {\n" +
                 "\n" +
                 "    public final String attr1;\n" +
-                "\n" +
                 "    public final Boo boo;\n" +
                 "\n" +
                 "    @JsonCreator\n" +
@@ -89,11 +85,31 @@ describe('Domain Generator', function () {
                 "            this.value = value;\n" +
                 "        }\n" +
                 "    }\n" +
-                "}\n")
+                "}\n";
+
+            console.log("difference between strings:" + getDifference(actual, expected));
+            expect(actual).to.equal(expected)
 
         });
 
     });
 
+
+    //assuming "b" contains a subsequence containing
+//all of the letters in "a" in the same order
+    function getDifference(a, b) {
+        let i = 0;
+        let j = 0;
+        let result = "";
+
+        while (j < b.length) {
+            if (a[i] !== b[j] || i === a.length)
+                result += b[j];
+            else
+                i++;
+            j++;
+        }
+        return result;
+    }
 
 });

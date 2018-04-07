@@ -28,7 +28,33 @@ function createDomain(inputPayload) {
 }
 
 function createJavaClassString(inputPayload) {
-    return createClass(new JavaClass.Builder(), parseXml(inputPayload).childNodes[0]).build();
+    let domain = createDomain(inputPayload);
+    let classStr = "package org.domain;";
+    classStr += "\n";
+    classStr += "import com.fasterxml.jackson.annotation.JsonCreator;" +
+        "\n" +
+        "import com.fasterxml.jackson.annotation.JsonProperty;" +
+        "\n" +
+        "import com.fasterxml.jackson.annotation.JsonRootName;" +
+        "\n" +
+        "import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;";
+    classStr += "\n";
+    classStr += "\n";
+    classStr += "@JsonRootName(\"" + domain.name + "\")";
+    classStr += "\n";
+    classStr += "public class " + capitalizeFirstLetter(domain.name) + " {";
+    classStr += "\n";
+    classStr += "\n";
+    domain.simpleProperties.forEach(property => {
+        classStr += "    public final String" + property + ";";
+        classStr += "\n";
+    });
+    domain.objectProperties.forEach(property => {
+        classStr += "    public final " + capitalizeFirstLetter(property.name) + " " + property.name + ";";
+        classStr += "\n";
+    });
+
+    return classStr;
 }
 
 function parseXml(xmlStr) {
@@ -36,4 +62,4 @@ function parseXml(xmlStr) {
 }
 
 
-export {createDomain,createJavaClassString};
+export {createDomain, createJavaClassString};
