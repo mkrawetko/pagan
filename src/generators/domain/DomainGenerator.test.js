@@ -1,7 +1,6 @@
 'use strict';
 import 'jsdom-global/register'
-import {convertToActionUnits, convertToDomain} from "../ActionUnitsConverter";
-import {createDomain} from "./DomainGenerator";
+import {createDomain, createJavaClassString} from "./DomainGenerator";
 
 const chai = require('chai')
     , expect = chai.expect;
@@ -19,9 +18,6 @@ describe('Domain Generator', function () {
             "    <moo moo1=\"moo1Val\"/>\n" +
             "</foo>";
 
-        const INPUT_ACTION_UNITS = convertToActionUnits(INPUT_PAYLOAD);
-
-
         it('should generate domain object', function () {
 
             let actual = createDomain(INPUT_PAYLOAD);
@@ -36,13 +32,26 @@ describe('Domain Generator', function () {
             expect(booProperty.simpleProperties.length).to.equal(2);
             expect(booProperty.simpleProperties[0]).to.equal("attr2");
             expect(booProperty.simpleProperties[1]).to.equal("attr3");
-            expect(booProperty.objectProperties.length).to.equal(0);
+            expect(booProperty.objectProperties.length).to.equal(1);
+
+            let innerBoo = booProperty.objectProperties[0];
+            expect(innerBoo.name).to.equal("innerboo");
+            expect(innerBoo.simpleProperties.length).to.equal(1);
+            expect(innerBoo.simpleProperties[0]).to.equal("innerbooAttr1");
+            expect(innerBoo.objectProperties.length).to.equal(0);
 
             let mooProperty = actual.objectProperties[1];
-            expect(booProperty.name).to.equal("moo");
-            expect(booProperty.simpleProperties.length).to.equal(1);
-            expect(booProperty.simpleProperties[0]).to.equal("moo1");
-            expect(booProperty.objectProperties.length).to.equal(0);
+            expect(mooProperty.name).to.equal("moo");
+            expect(mooProperty.simpleProperties.length).to.equal(1);
+            expect(mooProperty.simpleProperties[0]).to.equal("moo1");
+            expect(mooProperty.objectProperties.length).to.equal(0);
+
+        });
+
+        it('should generate valid java class string', function () {
+
+            let actual = createJavaClassString(INPUT_PAYLOAD);
+            console.log(actual);
 
             expect(actual).to.equal(
                 "package org.domain;\n" +
@@ -81,7 +90,10 @@ describe('Domain Generator', function () {
                 "        }\n" +
                 "    }\n" +
                 "}\n")
+
         });
 
     });
+
+
 });
